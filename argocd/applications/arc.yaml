@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  name: actions-runner-controller
+  namespace: argocd
+spec:
+  source:
+    path: apps/arc
+    repoURL: 'https://github.com/squoc/arc-argocd-deployment'
+    targetRevision: main
+  destination:
+    namespace: actions-runner-system
+    server: 'https://kubernetes.default.svc'
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        maxDuration: 3m0s
+        factor: 2
+    syncOptions:
+      - CreateNamespace=true
